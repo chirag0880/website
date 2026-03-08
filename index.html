@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KubeOps | Kubernetes Operations Expert</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Expert Kubernetes operations, CI/CD, and Cloud Native consulting for robust and scalable infrastructure.">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- GSAP for Smooth Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis for Buttery Smooth Scrolling -->
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+</head>
+<body>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="#" class="logo" style="text-decoration: none; color: inherit;">KubeOps<span>.</span></a>
+        <ul class="nav-links">
+            <li><a href="#services">Services</a></li>
+            <li><a href="#metrics">Experience</a></li>
+            <li><a href="https://calendly.com/chiragptl1111/30min" target="_blank" class="btn btn-primary" style="color: white; padding: 0.6rem 1.4rem;">Hire Me</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+            <h1>Scalable <span>Kubernetes</span> Operations</h1>
+            <p>I build, secure, and maintain resilient cloud-native infrastructure so you can focus entirely on shipping your code.</p>
+            <div class="hero-buttons">
+                <a href="#services" class="btn btn-primary">Explore Services</a>
+                <a href="https://calendly.com/chiragptl1111/30min" target="_blank" class="btn btn-outline">Let's Talk</a>
+            </div>
+        </div>
+
+        <div class="mockup-container">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                </div>
+                <div class="terminal-body">
+<span class="cmd">$ kubectl</span> get nodes
+NAME             STATUS   ROLES           AGE   VERSION
+kube-master-01   Ready    control-plane   42d   v1.28.3
+kube-worker-01   Ready    &lt;none&gt;          42d   v1.28.3
+kube-worker-02   Ready    &lt;none&gt;          42d   v1.28.3
+
+<span class="cmd">$ helm</span> upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-basic --create-namespace
+Release "ingress-nginx" does not exist. Installing it now.
+NAME: ingress-nginx
+LAST DEPLOYED: Wed Oct 25 10:32:15 2023
+NAMESPACE: ingress-basic
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Services Section -->
+    <section id="services" class="section">
+        <div class="section-header">
+            <h2>Everything you need to scale</h2>
+            <p>From ground-up cluster architecture to rescuing failing deployments, I provide end-to-end Kubernetes expertise.</p>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-network-wired"></i></div>
+                <h3>Cluster Architecture</h3>
+                <p>Designing highly available, scalable, and cost-effective Kubernetes architectures tailored perfectly to your specific workloads and traffic patterns.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-rocket"></i></div>
+                <h3>CI/CD Pipelines</h3>
+                <p>Automating zero-downtime deployments with modern GitOps tools like ArgoCD, Flux, or GitLab CI for continuous, confident delivery.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Security & Compliance</h3>
+                <p>Implementing strict RBAC, network policies, secrets management, and container scanning to keep your environments hardened and compliant.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>Observability</h3>
+                <p>Setting up Prometheus, Grafana, and ELK/Loki stacks for deep operational insights, alerting, and proactive issue resolution.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics Section -->
+    <section id="metrics" class="metrics">
+        <div class="metric-item">
+            <h3><span class="counter" data-target="50">0</span>+</h3>
+            <p>Clusters Deployed</p>
+        </div>
+        <div class="metric-item">
+            <h3><span class="counter" data-target="99.99">0</span>%</h3>
+            <p>Uptime Maintained</p>
+        </div>
+        <div class="metric-item">
+            <h3><span class="counter" data-target="5">0</span>+</h3>
+            <p>Years K8s Exp.</p>
+        </div>
+    </section>
+
+    <!-- CTA Contact Section -->
+    <section id="contact" class="cta">
+        <h2>Ready for production?</h2>
+        <p>Let's discuss how I can help optimize, secure, and operate your cloud-native infrastructure so your team can move faster.</p>
+        <a href="https://calendly.com/chiragptl1111/30min" target="_blank" class="btn btn-primary btn-large">Book a Meeting <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i></a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p style="margin:0; font-size: 0.95rem;">&copy; 2024 KubeOps Consulting. Built for scale.</p>
+        <div class="footer-links">
+            <a href="#"><i class="fab fa-github" style="font-size: 1.25rem;"></i></a>
+            <a href="#"><i class="fab fa-linkedin" style="font-size: 1.25rem;"></i></a>
+            <a href="#"><i class="fab fa-twitter" style="font-size: 1.25rem;"></i></a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
