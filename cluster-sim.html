@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KubeOps | Live Cluster Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* Override base layout for fullscreen sim */
+        body {
+            overflow: hidden;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Matrix Grid Background */
+        .cluster-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            z-index: 0;
+        }
+
+        .cluster-bg::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, transparent 20%, var(--bg-main) 90%);
+        }
+
+        /* Top Nav Overlay */
+        .sim-nav {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-offset);
+            backdrop-filter: blur(10px);
+            opacity: 0.9;
+        }
+
+        .sim-title {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pulse-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse-op 1.5s infinite;
+        }
+
+        @keyframes pulse-op {
+            0% { opacity: 0.4; } 50% { opacity: 1; box-shadow: 0 0 15px var(--success); } 100% { opacity: 0.4; }
+        }
+
+        /* Viewport for Pods */
+        #sim-viewport {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10;
+        }
+
+        .pod-node {
+            position: absolute;
+            width: 50px; height: 50px;
+            border-radius: 8px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .pod-node.running {
+            background: rgba(39, 201, 63, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            box-shadow: 0 0 20px rgba(39, 201, 63, 0.2);
+        }
+
+        .pod-node.pending {
+            background: rgba(255, 189, 46, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+            box-shadow: 0 0 20px rgba(255, 189, 46, 0.2);
+        }
+
+        .pod-node.terminating {
+            background: rgba(255, 95, 86, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            box-shadow: 0 0 20px rgba(255, 95, 86, 0.2);
+        }
+
+        .pod-node:hover {
+            transform: scale(1.2);
+            z-index: 50;
+        }
+
+        .pod-label {
+            position: absolute;
+            bottom: -25px;
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: var(--bg-offset);
+            padding: 2px 6px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .pod-node:hover .pod-label {
+            opacity: 1;
+        }
+
+        /* Side Panel Stats & Logs */
+        .side-panel {
+            position: absolute;
+            top: 80px; right: -400px;
+            width: 380px; height: calc(100vh - 100px);
+            background: var(--bg-offset);
+            backdrop-filter: blur(15px);
+            opacity: 0.95;
+            border-left: 1px solid var(--border);
+            z-index: 100;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .side-panel.open {
+            right: 0;
+        }
+
+        .panel-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: transparent; border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem; cursor: pointer;
+        }
+
+        .panel-close:hover { color: var(--text-main); }
+
+        .panel-header h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pod-status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .bg-running { background: rgba(39, 201, 63, 0.2); color: var(--success); }
+        .bg-pending { background: rgba(255, 189, 46, 0.2); color: var(--warning); }
+
+        .metrics-mini {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+        }
+        .metric-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 4px; padding: 1rem;
+            text-align: center;
+        }
+        .metric-val { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: var(--primary); }
+        .metric-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 5px; }
+
+        .log-terminal {
+            flex-grow: 1;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .log-line span.ts { color: #6a8759; margin-right: 8px; }
+        .log-line span.inf { color: #5bc0be; }
+        .log-line span.err { color: #ff5f56; }
+        
+        /* Custom scrollbar for terminal */
+        .log-terminal::-webkit-scrollbar { width: 6px; }
+        .log-terminal::-webkit-scrollbar-track { background: var(--bg-main); }
+        .log-terminal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .btn-kill {
+            background: rgba(255, 95, 86, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: all 0.2s;
+        }
+        .btn-kill:hover { background: var(--danger); color: white; box-shadow: 0 0 10px var(--danger); }
+        .pod-node.exploding { animation: explode 0.5s forwards; pointer-events: none; }
+        @keyframes explode {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.5); filter: brightness(2) drop-shadow(0 0 20px red); background: red; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        .pod-node.routing-traffic { animation: route-pulse 1s 3; z-index: 100; }
+        @keyframes route-pulse {
+            0%, 100% { box-shadow: 0 0 10px var(--primary); border-color: var(--primary); }
+            50% { box-shadow: 0 0 40px var(--primary), 0 0 20px #fff; border-color: #fff; background: rgba(50,108,229, 0.4); transform: scale(1.3); }
+        }
+
+        .traffic-particle {
+            position: absolute;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 20px 5px rgba(50, 108, 229, 0.8), 0 0 40px var(--primary);
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .pod-destroy-btn {
+            position: absolute;
+            top: -10px; right: -10px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px; height: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.2s;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 10px var(--danger);
+            z-index: 10;
+        }
+        .pod-node.running:hover .pod-destroy-btn {
+            opacity: 1;
+        }
+        .pod-destroy-btn:hover {
+            transform: scale(1.5);
+            background: #ff2a1f;
+        }
+
+        /* Tutorial Overlay */
+        .tutorial-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .tutorial-overlay.active { display: flex; }
+        
+        .tutorial-box {
+            background: var(--bg-offset);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 3rem;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(50, 108, 229, 0.2);
+            position: relative;
+        }
+        
+        .tutorial-step-title {
+            font-family: 'Syncopate', sans-serif;
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tutorial-step-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .tutorial-visual {
+            height: 200px;
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Step Visual Elements */
+        .vis-cluster { width: 80%; height: 80%; border: 2px dashed var(--primary); border-radius: 8px; display: flex; gap: 10px; padding: 10px; justify-content: center; align-items: center; }
+        .vis-node { flex: 1; height: 100%; border: 1px solid var(--text-muted); border-radius: 4px; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); }
+        .vis-pod { width: 100%; height: 30px; background: rgba(39, 201, 63, 0.2); border: 1px solid var(--success); border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 12px; }
+        .vis-pod.failed { background: rgba(255, 95, 86, 0.2); border-color: var(--danger); color: var(--danger); animation: shake 0.5s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .btn-tutorial-next {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .btn-tutorial-next:hover {
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Apply Theme from localStorage -->
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    </script>
+
+    <div class="cluster-bg"></div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="tutorial-overlay">
+        <div class="tutorial-box">
+            <h2 id="tut-title" class="tutorial-step-title">Welcome to Content</h2>
+            <div id="tut-vis" class="tutorial-visual">
+                <!-- Visuals injected here via JS -->
+            </div>
+            <p id="tut-desc" class="tutorial-step-desc">Description</p>
+            <button id="tut-next-btn" class="btn-tutorial-next" onclick="nextTutorialStep()">Next Step <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <nav class="sim-nav">
+        <a href="projects.html" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.8rem;">
+            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit Node
+        </a>
+        <div class="sim-title">
+            <div class="pulse-dot"></div>
+            <span id="nav-ns-label">NAMESPACE: production | REGION: us-east-1</span>
+        </div>
+        <button onclick="startTutorial()" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.8rem; border-color: var(--primary); color: var(--primary);">
+            <i class="fas fa-play" style="margin-right: 8px;"></i> Start Tour
+        </button>
+    </nav>
+
+    <div id="sim-viewport"></div>
+
+    <div id="side-panel" class="side-panel">
+        <button class="panel-close" onclick="closePanel()"><i class="fas fa-times"></i></button>
+        <div class="panel-header">
+            <h3 id="panel-pod-name">auth-service-7f89b9d-xyz</h3>
+            <div id="panel-pod-status" class="pod-status-badge bg-running">Running</div>
+            <br>
+            <button id="btn-kill-pod" class="btn-kill" onclick="killCurrentPod()">
+                <i class="fas fa-skull"></i> Simulate Pod Failure
+            </button>
+        </div>
+
+        <div class="metrics-mini">
+            <div class="metric-box">
+                <div id="metric-cpu" class="metric-val">12m</div>
+                <div class="metric-lbl">CPU Usage</div>
+            </div>
+            <div class="metric-box">
+                <div id="metric-mem" class="metric-val">128Mi</div>
+                <div class="metric-lbl">Memory</div>
+            </div>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom:-10px;">Live Container Logs:</div>
+        <div id="log-terminal" class="log-terminal">
+            <!-- Logs spawn here -->
+        </div>
+    </div>
+
+    <script>
+        const viewport = document.getElementById('sim-viewport');
+        const sidePanel = document.getElementById('side-panel');
+        const paramStr = new URLSearchParams(window.location.search).get('proj') || '';
+        
+        // Configuration
+        const podCount = 45;
+        let microservices = ['auth-service', 'payment-gateway', 'inventory-db', 'frontend-ui', 'redis-cache', 'worker-queue'];
+        let namespaceName = 'production | REGION: us-east-1';
+
+        if(paramStr === 'mssp') {
+            microservices = ['soc-monitor', 'threat-response', 'red-team-agent', 'appsec-scanner', 'defense-node', 'log-aggregator'];
+            namespaceName = 'mssp-core | REGION: us-east-1';
+        } else if(paramStr === 'fintech') {
+            microservices = ['ledger-db', 'payment-gateway', 'fraud-detection', 'user-vault', 'crypto-service', 'worker-queue'];
+            namespaceName = 'fintech-core | REGION: eu-west-1';
+        } else if(paramStr === 'ecommerce') {
+            microservices = ['cart-service', 'checkout-ui', 'inventory-db', 'recommendation-engine', 'order-processor'];
+            namespaceName = 'global-ecommerce | REGION: us-west-2';
+        } else if(paramStr === 'saas') {
+            microservices = ['tenant-api', 'billing-service', 'user-management', 'core-platform', 'metrics-db'];
+            namespaceName = 'saas-multi-tenant | REGION: ap-south-1';
+        }
+
+        document.getElementById('nav-ns-label').innerText = `NAMESPACE: ${namespaceName}`;
+
+        let activeInterval = null;
+        let currentActivePodElement = null;
+        let currentActiveService = null;
+
+        function spawnPod(specificService = null, isReplacement = false) {
+            const pod = document.createElement('div');
+            const stateRand = Math.random();
+            const state = isReplacement ? 'pending' : (stateRand > 0.15 ? 'running' : (stateRand > 0.05 ? 'pending' : 'terminating'));
+            const service = specificService || microservices[Math.floor(Math.random() * microservices.length)];
+            const podId = `${service}-${Math.random().toString(36).substring(2, 7)}`;
+            
+            pod.className = `pod-node ${state}`;
+            pod.dataset.service = service;
+            
+            // Icon logic based on service
+            let icon = 'fa-cube';
+            if(service.includes('db') || service.includes('redis')) icon = 'fa-database';
+            if(service.includes('frontend')) icon = 'fa-window-maximize';
+            if(service.includes('auth')) icon = 'fa-shield-alt';
+
+            pod.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <div class="pod-label">${podId}</div>
+                <button class="pod-destroy-btn" title="Simulate Failure"><i class="fas fa-times"></i></button>
+            `;
+            
+            // Random positioning avoiding nav area
+            let startX = Math.random() * (window.innerWidth - 100) + 50;
+            let startY = Math.random() * (window.innerHeight - 200) + 100;
+            
+            if(isReplacement) {
+                // Spawn replacement pods closer to the center of the screen for visibility
+                startX = (window.innerWidth / 2) + (Math.random() * 100 - 50);
+                startY = (window.innerHeight / 2) + (Math.random() * 100 - 50);
+            }
+            
+            gsap.set(pod, { x: startX, y: startY });
+            
+            // Floating animation
+            gsap.to(pod, {
+                x: `+=${Math.random() * 60 - 30}`,
+                y: `+=${Math.random() * 60 - 30}`,
+                duration: 2 + Math.random() * 3,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+
+            // Interaction
+            pod.addEventListener('click', (e) => {
+                if(e.target.closest('.pod-destroy-btn')) {
+                    e.stopPropagation();
+                    triggerPodFailure(pod, service);
+                } else {
+                    openPanel(podId, state, service, pod);
+                }
+            });
+            viewport.appendChild(pod);
+            
+            if(isReplacement) {
+                // Simulate start up sequence
+                setTimeout(() => {
+                    pod.className = `pod-node running`;
+                }, 2000);
+            }
+        }
+
+        // Generate Pods at start
+        for(let i=0; i<podCount; i++) {
+            spawnPod();
+        }
+
+        function openPanel(podId, state, service, element) {
+            currentActivePodElement = element;
+            currentActiveService = service;
+            sidePanel.classList.add('open');
+            document.getElementById('panel-pod-name').innerText = podId;
+            document.getElementById('btn-kill-pod').style.display = 'inline-flex';
+            
+            const badge = document.getElementById('panel-pod-status');
+            badge.innerText = state;
+            badge.className = `pod-status-badge bg-${state === 'terminating' ? 'pending' : state}`; // Hack for css classes
+
+            // Randomize metrics
+            document.getElementById('metric-cpu').innerText = `${Math.floor(Math.random() * 200 + 5)}m`;
+            document.getElementById('metric-mem').innerText = `${Math.floor(Math.random() * 500 + 50)}Mi`;
+
+            const terminal = document.getElementById('log-terminal');
+            terminal.innerHTML = ''; // clear
+
+            if(activeInterval) clearInterval(activeInterval);
+
+            // Generate initial logs
+            appendLog(terminal, "Init", `Starting container ${service}`);
+            appendLog(terminal, "Info", `Connecting to cluster network... OK`);
+
+            // Stream fake logs continuously
+            let logCount = 0;
+            activeInterval = setInterval(() => {
+                if(logCount > 50) {
+                    terminal.removeChild(terminal.firstChild); // keep it clean
+                }
+                const isErr = Math.random() > 0.95;
+                const type = isErr ? "Err" : (Math.random() > 0.5 ? "Info" : "Debug");
+                const msgs = [
+                    "Received health check request from kubelet",
+                    "Processing background job...",
+                    "Memory garbage collection triggered",
+                    "Connected to metrics server payload",
+                    "Awaiting internal RPC call",
+                    "Serving HTTP GET 200 OK"
+                ];
+                
+                let msg = msgs[Math.floor(Math.random() * msgs.length)];
+                if(isErr) msg = "Connection timeout while probing redis cache. Retrying...";
+                
+                appendLog(terminal, type, msg);
+                logCount++;
+            }, 800 + Math.random() * 1000);
+        }
+
+        function killCurrentPod() {
+            if(!currentActivePodElement) return;
+            triggerPodFailure(currentActivePodElement, currentActiveService);
+        }
+
+        function triggerPodFailure(podToKill, serviceName) {
+            if(!podToKill) return;
+
+            const terminal = document.getElementById('log-terminal');
+            const isPanelOpen = (currentActivePodElement === podToKill && sidePanel.classList.contains('open'));
+            
+            // 1. Log failure & UI Updates if Panel open
+            if(isPanelOpen) {
+                appendLog(terminal, "Err", `FATAL: SIGKILL received. Process terminated unexpectedly.`);
+                document.getElementById('btn-kill-pod').style.display = 'none';
+                document.getElementById('panel-pod-status').className = 'pod-status-badge bg-pending';
+                document.getElementById('panel-pod-status').innerText = 'Terminated';
+                
+                // Traffic Shift Logging
+                appendLog(terminal, "Info", `Load balancer detected failure. Rerouting traffic...`);
+            }
+            
+            // 2. Explode animation
+            const fromRect = podToKill.getBoundingClientRect();
+            podToKill.classList.add('exploding');
+            
+            // 3. Traffic Shift Logic
+            const allPods = document.querySelectorAll('.pod-node.running');
+            let replica = null;
+            for(let i=0; i<allPods.length; i++) {
+                if(allPods[i].dataset.service === serviceName && allPods[i] !== podToKill) {
+                    replica = allPods[i]; break;
+                }
+            }
+            if(!replica && allPods.length > 0) replica = allPods[0]; 
+            
+            if(replica) {
+                const toRect = replica.getBoundingClientRect();
+
+                // Generate traveling particles
+                for(let i=0; i<8; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'traffic-particle';
+                        document.body.appendChild(particle);
+                        
+                        // GSAP handles node positions directly via transforms, but since particle is fixed to body
+                        // we can animate absolute body positions dynamically
+                        const fromX = fromRect.left + (fromRect.width/2);
+                        const fromY = fromRect.top + (fromRect.height/2);
+                        
+                        // Dynamic toX and toY in case replica is moving
+                        gsap.set(particle, { x: fromX, y: fromY });
+                        
+                        gsap.to(particle, { 
+                            x: () => { const r = replica.getBoundingClientRect(); return r.left + r.width/2; },
+                            y: () => { const r = replica.getBoundingClientRect(); return r.top + r.height/2; },
+                            duration: 1.2, 
+                            ease: 'power1.inOut',
+                            onComplete: () => particle.remove()
+                        });
+
+                    }, i * 150);
+                }
+
+                replica.classList.add('routing-traffic');
+                setTimeout(() => replica.classList.remove('routing-traffic'), 3000);
+                
+                if(isPanelOpen) {
+                    setTimeout(() => {
+                        appendLog(terminal, "Info", `Traffic successfully shifted to replica: ${replica.querySelector('.pod-label').innerText}`);
+                        appendLog(terminal, "Info", `Zero downtime maintained. 0 dropped requests.`);
+                    }, 800);
+                }
+            }
+
+            // Cleanup exploded pod
+            setTimeout(() => {
+                if(podToKill.parentNode) podToKill.parentNode.removeChild(podToKill);
+            }, 500);
+
+            // 4. Self Healing
+            setTimeout(() => {
+                if(isPanelOpen) appendLog(terminal, "Info", `ReplicaSet controller creating new replacement pod...`);
+            }, 1500);
+            
+            setTimeout(() => {
+                spawnPod(serviceName, true); 
+                if(isPanelOpen) appendLog(terminal, "Info", `New pod scheduled and initializing network...`);
+            }, 3000);
+
+            if(isPanelOpen) currentActivePodElement = null;
+        }
+
+        function closePanel() {
+            sidePanel.classList.remove('open');
+            if(activeInterval) clearInterval(activeInterval);
+            currentActivePodElement = null;
+        }
+
+        function appendLog(term, type, msg) {
+            const time = new Date().toISOString().substring(11, 23); // HH:MM:SS.mmm
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            let typeColorClass = type === 'Err' ? 'err' : 'inf';
+            line.innerHTML = `<span class="ts">[${time}]</span> <span class="${typeColorClass}">[${type}]</span> ${msg}`;
+            term.appendChild(line);
+            term.scrollTop = term.scrollHeight; // Auto scroll to bottom
+        }
+
+        // ==========================================
+        // STEP-BY-STEP TUTORIAL LOGIC
+        // ==========================================
+        const tutorialSteps = [
+            {
+                title: "1. The Cluster",
+                desc: "A Kubernetes Cluster is the foundation. It groups together multiple physical or virtual machines into one seamless, highly-available environment.",
+                vis: `<div class="vis-cluster" style="opacity:0;" id="v-cluster">
+                        <div style="position: absolute; top:-15px; background:var(--bg-offset); padding: 0 10px; color:var(--primary); font-family:'JetBrains Mono';">K8s Cluster</div>
+                      </div>`,
+                anim: () => { gsap.to("#v-cluster", {opacity: 1, scale: 1.1, duration: 1, ease: "back.out"}); }
+            },
+            {
+                title: "2. The Nodes",
+                desc: "Inside the cluster are Nodes (the actual servers). If one node's hardware fails, the cluster instantly moves its workloads to a healthy node.",
+                vis: `<div class="vis-cluster">
+                        <div class="vis-node" style="opacity:0; transform:translateY(20px);" id="v-node1"><div style="text-align:center;font-size:10px;color:var(--text-muted);">Node 1</div></div>
+                        <div class="vis-node" style="opacity:0; transform:translateY(20px);" id="v-node2"><div style="text-align:center;font-size:10px;color:var(--text-muted);">Node 2</div></div>
+                        <div class="vis-node" style="opacity:0; transform:translateY(20px);" id="v-node3"><div style="text-align:center;font-size:10px;color:var(--text-muted);">Node 3</div></div>
+                      </div>`,
+                anim: () => { gsap.to(".vis-node", {opacity: 1, y: 0, duration: 0.5, stagger: 0.2}); }
+            },
+            {
+                title: "3. The Pods & Containers",
+                desc: "Your application is broken down into Microservices, running inside Pods on these Nodes. Each Pod contains your code container.",
+                vis: `<div class="vis-cluster">
+                        <div class="vis-node">
+                            <div class="vis-pod" style="opacity:0; transform:scale(0);" id="vp1"><i class="fas fa-cube"></i></div>
+                            <div class="vis-pod" style="opacity:0; transform:scale(0);" id="vp2"><i class="fas fa-database"></i></div>
+                        </div>
+                        <div class="vis-node">
+                            <div class="vis-pod" style="opacity:0; transform:scale(0);" id="vp3"><i class="fas fa-shield-alt"></i></div>
+                        </div>
+                        <div class="vis-node">
+                            <div class="vis-pod" style="opacity:0; transform:scale(0);" id="vp4"><i class="fas fa-cube"></i></div>
+                        </div>
+                      </div>`,
+                anim: () => { gsap.to(".vis-pod", {opacity: 1, scale: 1, duration: 0.4, stagger: 0.1, ease: "back.out"}); }
+            },
+            {
+                title: "4. Simulating Failure",
+                desc: "What happens if a fatal error crashes the application container? Let's simulate a crash on the Auth Service.",
+                vis: `<div class="vis-cluster">
+                        <div class="vis-node">
+                            <div class="vis-pod"><i class="fas fa-cube"></i></div>
+                            <div class="vis-pod"><i class="fas fa-database"></i></div>
+                        </div>
+                        <div class="vis-node">
+                            <div class="vis-pod" id="v-fail-pod"><i class="fas fa-shield-alt"></i> Auth</div>
+                        </div>
+                        <div class="vis-node">
+                            <div class="vis-pod"><i class="fas fa-cube"></i></div>
+                        </div>
+                      </div>`,
+                anim: () => { 
+                    setTimeout(() => {
+                        const badPod = document.getElementById("v-fail-pod");
+                        badPod.classList.add("failed");
+                        badPod.innerHTML = '<i class="fas fa-skull"></i> FAIL';
+                    }, 1000);
+                }
+            },
+            {
+                title: "5. Automated Recovery",
+                desc: "Kubernetes instantly detects the crashed container. It destroys the broken Pod and automatically spins up a fresh container on a healthy Node.",
+                vis: `<div class="vis-cluster">
+                        <div class="vis-node">
+                            <div class="vis-pod"><i class="fas fa-cube"></i></div>
+                            <div class="vis-pod"><i class="fas fa-database"></i></div>
+                        </div>
+                        <div class="vis-node">
+                            <div class="vis-pod failed" id="bad-pod-del" style="opacity:0.5;"><i class="fas fa-skull"></i> Terminating</div>
+                        </div>
+                        <div class="vis-node">
+                            <div class="vis-pod"><i class="fas fa-cube"></i></div>
+                            <div class="vis-pod" id="new-pod-spawn" style="background:rgba(255,189,46,0.2); border-color:var(--warning); color:var(--warning);"><i class="fas fa-sync fa-spin"></i> Init...</div>
+                        </div>
+                      </div>`,
+                anim: () => { 
+                    setTimeout(() => {
+                        gsap.to("#bad-pod-del", {scale: 0, opacity: 0, duration: 0.5});
+                        const newPod = document.getElementById("new-pod-spawn");
+                        setTimeout(() => {
+                            newPod.style.background = "rgba(39, 201, 63, 0.2)";
+                            newPod.style.borderColor = "var(--success)";
+                            newPod.style.color = "var(--success)";
+                            newPod.innerHTML = '<i class="fas fa-shield-alt"></i> Auth';
+                            gsap.fromTo(newPod, {scale:1.2, boxShadow:"0 0 20px var(--success)"}, {scale:1, boxShadow:"none", duration:1});
+                        }, 1000);
+                    }, 1000);
+                }
+            }
+        ];
+
+        let tutIndex = 0;
+        
+        function startTutorial() {
+            tutIndex = 0;
+            document.getElementById('tutorial-overlay').classList.add('active');
+            renderTutorialStep();
+        }
+
+        function renderTutorialStep() {
+            if(tutIndex >= tutorialSteps.length) {
+                document.getElementById('tutorial-overlay').classList.remove('active');
+                return;
+            }
+
+            const step = tutorialSteps[tutIndex];
+            document.getElementById('tut-title').innerText = step.title;
+            document.getElementById('tut-desc').innerText = step.desc;
+            document.getElementById('tut-vis').innerHTML = step.vis;
+            
+            if(tutIndex === tutorialSteps.length - 1) {
+                document.getElementById('tut-next-btn').innerHTML = 'Finish <i class="fas fa-check"></i>';
+            } else {
+                document.getElementById('tut-next-btn').innerHTML = 'Next Step <i class="fas fa-arrow-right"></i>';
+            }
+
+            if(step.anim) step.anim();
+        }
+
+        function nextTutorialStep() {
+            tutIndex++;
+            renderTutorialStep();
+        }
+
+        // Auto-start tutorial on first load if missing a flag
+        if(!localStorage.getItem('k8s_tour_seen')) {
+            setTimeout(startTutorial, 1500);
+            localStorage.setItem('k8s_tour_seen', 'true');
+        }
+    </script>
+</body>
+</html>

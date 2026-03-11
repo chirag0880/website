@@ -345,6 +345,87 @@ h1 span, h2 span { color: var(--primary); text-shadow: 0 0 30px var(--primary-gl
 }
 .pipe-stage.deploy { border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); color: var(--primary); font-weight: bold;}
 
+/* Projects Stack */
+.projects-stack {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+.project-card {
+    position: absolute;
+    width: 320px;
+    height: 200px;
+    background: var(--bg-offset);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+.project-card.back {
+    transform: translateZ(-100px) translateY(-50px);
+    opacity: 0.1; /* further reduced to prevent bleed */
+    z-index: 1;
+}
+.project-card.middle {
+    transform: translateZ(-50px) translateY(-25px);
+    opacity: 0.2; /* further reduced to prevent bleed */
+    z-index: 2;
+}
+.project-card.front {
+    transform: translateZ(0) translateY(0);
+    z-index: 3;
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px var(--primary-glow);
+    background: var(--bg-main); /* solid background to prevent text bleed from cards behind */
+}
+.card-header {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+.card-metrics {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+.card-header.highlight-header {
+    color: var(--text-main);
+    font-size: 1.5rem;
+}
+.card-metrics.highlight-text {
+    color: var(--primary);
+    font-weight: bold;
+}
+.card-action {
+    margin-top: auto;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--success);
+    font-family: 'JetBrains Mono', monospace;
+    animation: fadePulse 2s infinite;
+}
+
+@keyframes fadePulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+.spec-value.highlight {
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary-glow);
+}
+
 /* Center Layout - Metrics */
 .center-layout { text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;}
 .metrics-grid {

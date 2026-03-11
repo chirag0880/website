@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KubeOps | Multi-Cloud SaaS Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        body {
+            overflow: hidden;
+            background-color: var(--bg-main) !important;
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .network-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, rgba(50, 108, 229, 0.05) 0%, var(--bg-main) 70%);
+            z-index: 0;
+        }
+
+        .grid-dots {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.5;
+        }
+
+        /* Top Nav */
+        .sim-nav {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-offset);
+            opacity: 0.9;
+            backdrop-filter: blur(10px);
+        }
+
+        .sim-title {
+            font-family: 'JetBrains Mono', monospace;
+            color: #8b5cf6; /* Purple theme for multi-cloud */
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pulse-dot-purple {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #8b5cf6;
+            box-shadow: 0 0 10px #8b5cf6;
+            animation: pulse-purple 1.5s infinite;
+        }
+
+        @keyframes pulse-purple {
+            0% { opacity: 0.4; } 50% { opacity: 1; box-shadow: 0 0 20px #8b5cf6; } 100% { opacity: 0.4; }
+        }
+
+        /* Viewport */
+        #sim-viewport {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10;
+        }
+
+        .cloud-node {
+            position: absolute;
+            width: 140px; height: 140px;
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+            z-index: 20;
+        }
+
+        .cloud-node i {
+            font-size: 3rem;
+            margin-bottom: 5px;
+        }
+
+        .cloud-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Specific Cloud Styling */
+        #node-aws { border-color: #ff9900; box-shadow: 0 0 30px rgba(255, 153, 0, 0.2); }
+        #node-aws i { color: #ff9900; }
+        
+        #node-gcp { border-color: #4285f4; box-shadow: 0 0 30px rgba(66, 133, 244, 0.2); }
+        #node-gcp i { color: #4285f4; }
+        
+        #node-azure { border-color: #0089d6; box-shadow: 0 0 30px rgba(0, 137, 214, 0.2); }
+        #node-azure i { color: #0089d6; }
+        
+        #node-oracle { border-color: #f80000; box-shadow: 0 0 30px rgba(248, 0, 0, 0.2); }
+        #node-oracle i { color: #f80000; }
+
+        #node-core {
+            width: 180px; height: 180px;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        #node-core i { color: #8b5cf6; font-size: 4rem;}
+        #node-core .cloud-label { color: #fff; font-size: 1rem; }
+
+        /* Animated Rings */
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
+        }
+        .ring-1 { width: 400px; height: 400px; animation: spin-slow 60s linear infinite; }
+        .ring-2 { width: 700px; height: 700px; animation: spin-slow 90s linear infinite reverse; }
+
+        @keyframes spin-slow { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* Data Particles */
+        .data-particle {
+            position: absolute;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        /* SVG Connections */
+        #svg-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .net-line {
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+            fill: none;
+        }
+
+        .net-line.active {
+            stroke: rgba(255, 255, 255, 0.4);
+            animation: dash-flow 2s linear infinite;
+        }
+
+        @keyframes dash-flow { to { stroke-dashoffset: -20; } }
+
+        .sync-terminal {
+            position: absolute;
+            bottom: 30px; right: 30px;
+            width: 400px; height: 300px;
+            background: var(--bg-main);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            display: flex; flex-direction: column;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .term-header {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.8rem;
+            color: #8b5cf6;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex; justify-content: space-between;
+        }
+
+        .log-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            color: #a9b7c6;
+        }
+
+        .log-container::-webkit-scrollbar { width: 4px; }
+        .log-container::-webkit-scrollbar-track { background: transparent; }
+        .log-container::-webkit-scrollbar-thumb { background: #8b5cf6; }
+
+        .log-line span.ts { color: #6a8759; }
+        .log-line span.aws { color: #ff9900; font-weight: bold; }
+        .log-line span.gcp { color: #4285f4; font-weight: bold; }
+        .log-line span.azure { color: #0089d6; font-weight: bold; }
+        .log-line span.oracle { color: #f80000; font-weight: bold; }
+        .log-line span.core { color: #8b5cf6; font-weight: bold; }
+
+        .control-panel {
+            position: absolute;
+            bottom: 30px; left: 30px;
+            background: var(--bg-offset);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid #8b5cf6;
+            color: var(--text-main);
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background: #8b5cf6;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+        .btn:last-child { margin-bottom: 0; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Apply Theme from localStorage -->
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    </script>
+    
+    <div class="network-bg"></div>
+    <div class="grid-dots"></div>
+
+    <nav class="sim-nav">
+        <a href="projects.html" class="btn-outline" style="text-decoration:none; color:var(--text-main); border:1px solid var(--border); padding: 0.6rem 1.2rem; border-radius:4px; font-size: 0.8rem; font-family:'JetBrains Mono';">
+            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit Network
+        </a>
+        <div class="sim-title">
+            <div class="pulse-dot-purple"></div>
+            <span>SAAS_MESH_NETWORK // MULTI-CLOUD ACTIVE</span>
+        </div>
+        <div style="width: 100px;"></div>
+    </nav>
+
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+
+    <svg id="svg-layer">
+        <!-- Lines will be dynamically updated by JS -->
+        <line id="line-aws" class="net-line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line-gcp" class="net-line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line-azure" class="net-line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line-oracle" class="net-line" x1="0" y1="0" x2="0" y2="0"/>
+    </svg>
+
+    <div id="sim-viewport">
+        <!-- Core Node (Center) -->
+        <div class="cloud-node" id="node-core">
+            <i class="fas fa-network-wired"></i>
+            <div class="cloud-label">KubeOps Mesh</div>
+        </div>
+
+        <!-- Satellite Nodes -->
+        <div class="cloud-node" id="node-aws"><i class="fab fa-aws"></i><div class="cloud-label">AWS</div></div>
+        <div class="cloud-node" id="node-gcp"><i class="fab fa-google"></i><div class="cloud-label">Google Cloud</div></div>
+        <div class="cloud-node" id="node-azure"><i class="fab fa-microsoft"></i><div class="cloud-label">Azure</div></div>
+        <div class="cloud-node" id="node-oracle"><i class="fas fa-database"></i><div class="cloud-label">Oracle Cloud</div></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="control-panel">
+        <div style="font-family:'Syncopate'; font-size:0.8rem; color:#8b5cf6; margin-bottom:15px; border-bottom:1px solid rgba(139,92,246,0.3); padding-bottom:5px;">Traffic Controls</div>
+        <button class="btn" onclick="triggerSync('aws')">Sync AWS Data</button>
+        <button class="btn" onclick="triggerSync('gcp')">Load Balance GCP</button>
+        <button class="btn" onclick="triggerSync('azure')">Failover to Azure</button>
+        <button class="btn" onclick="triggerSync('oracle')">Backup to Oracle</button>
+        <button class="btn" onclick="triggerGlobalSync()" style="background:rgba(255,255,255,0.1); border-color:#fff; margin-top:15px;">Global Mesh Sync</button>
+    </div>
+
+    <!-- Terminal -->
+    <div class="sync-terminal">
+        <div class="term-header">
+            <span><i class="fas fa-satellite-dish"></i> Mesh Gateway Router</span>
+            <span style="color:#27c93f;">ONLINE</span>
+        </div>
+        <div class="log-container" id="log-container">
+            <div class="log-line"><span class="ts">[INIT]</span> BGP peering established across all zones.</div>
+            <div class="log-line"><span class="ts">[SYS]</span> Multi-cloud mesh routing is optimal.</div>
+        </div>
+    </div>
+
+    <script>
+        // Node Layout Variables
+        const cx = window.innerWidth / 2 + 80; // Shift cluster to the right to avoid left panel
+        const cy = window.innerHeight / 2 + 70; // Shift entire cluster down significantly to avoid nav bar and title
+        
+        const nodes = {
+            core: { el: document.getElementById('node-core'), x: cx, y: cy, color: '#8b5cf6', tag: 'core' },
+            aws: { el: document.getElementById('node-aws'), r: 350, angle: -Math.PI / 4, color: '#ff9900', tag: 'aws' },      // Top Left
+            gcp: { el: document.getElementById('node-gcp'), r: 350, angle: Math.PI / 4, color: '#4285f4', tag: 'gcp' },       // Bottom Left
+            azure: { el: document.getElementById('node-azure'), r: 350, angle: Math.PI * 3/4, color: '#0089d6', tag: 'azure' },// Bottom Right
+            oracle: { el: document.getElementById('node-oracle'), r: 350, angle: -Math.PI * 3/4, color: '#f80000', tag: 'oracle'} // Top Right
+        };
+
+        const logs = document.getElementById('log-container');
+
+        function appendLog(msg) {
+            const time = new Date().toISOString().substring(11, 23);
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            line.innerHTML = `<span class="ts">[${time}]</span> ${msg}`;
+            logs.appendChild(line);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        // Initialize Positions and Lines
+        function initLayout() {
+            gsap.set(nodes.core.el, { x: nodes.core.x, y: nodes.core.y });
+            
+            ['aws', 'gcp', 'azure', 'oracle'].forEach(key => {
+                const n = nodes[key];
+                // Calculate Cartesian from Polar
+                n.x = cx + Math.cos(n.angle) * n.r;
+                n.y = cy + Math.sin(n.angle) * n.r;
+                
+                // Add tiny floating animation
+                gsap.set(n.el, { x: n.x, y: n.y });
+                gsap.to(n.el, {
+                    y: `+=${Math.random() * 20 - 10}`,
+                    x: `+=${Math.random() * 20 - 10}`,
+                    duration: 2 + Math.random() * 2,
+                    repeat: -1, yoyo: true, ease: "sine.inOut"
+                });
+
+                // Set SVG Line
+                const line = document.getElementById(`line-${key}`);
+                line.setAttribute('x1', cx);
+                line.setAttribute('y1', cy);
+                line.setAttribute('x2', n.x);
+                line.setAttribute('y2', n.y);
+            });
+        }
+
+        window.addEventListener('resize', () => { location.reload(); }); // Simple resize handling
+        initLayout();
+
+        // Animation logic
+        function triggerSync(target) {
+            const targetNode = nodes[target];
+            const line = document.getElementById(`line-${target}`);
+            
+            // Visual feedback
+            line.classList.add('active');
+            line.style.stroke = targetNode.color;
+            gsap.to(targetNode.el, { scale: 1.1, boxShadow: `0 0 50px ${targetNode.color}`, duration: 0.3, yoyo: true, repeat: 1 });
+            gsap.to(nodes.core.el, { scale: 1.05, boxShadow: `0 0 80px #8b5cf6`, duration: 0.3, yoyo: true, repeat: 1 });
+
+            // Generate particles moving back and forth
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const pkt = document.createElement('div');
+                    pkt.className = 'data-particle';
+                    pkt.style.boxShadow = `0 0 15px ${targetNode.color}, 0 0 5px #fff`;
+                    document.body.appendChild(pkt);
+
+                    const toCore = Math.random() > 0.5;
+                    const startX = toCore ? targetNode.x : cx;
+                    const startY = toCore ? targetNode.y : cy;
+                    const endX = toCore ? cx : targetNode.x;
+                    const endY = toCore ? cy : targetNode.y;
+
+                    gsap.set(pkt, { x: startX, y: startY });
+                    gsap.to(pkt, {
+                        x: endX, y: endY, 
+                        duration: 1 + Math.random() * 1,
+                        ease: "power1.inOut",
+                        onComplete: () => pkt.remove()
+                    });
+                }, i * 100);
+            }
+
+            // Log messages based on action
+            const speed = Math.floor(Math.random() * 500 + 100);
+            if(target === 'aws') appendLog(`Synchronizing <span class="aws">AWS Cloud</span> S3 buckets to Mesh Core... (${speed}MB/s)`);
+            if(target === 'gcp') appendLog(`Rerouting traffic spikes to <span class="gcp">Google Cloud</span> Compute Engines...`);
+            if(target === 'azure') appendLog(`Failover initiated. Migrating workloads from Core to <span class="azure">Azure Region</span>...`);
+            if(target === 'oracle') appendLog(`Backing up transactional logs to <span class="oracle">Oracle Autonomous DB</span>...`);
+
+            setTimeout(() => {
+                line.classList.remove('active');
+                line.style.stroke = 'rgba(255, 255, 255, 0.1)';
+                appendLog(`Operation complete for <span class="${target}">${target.toUpperCase()}</span>.`);
+            }, 2500);
+        }
+
+        function triggerGlobalSync() {
+            appendLog(`Initiating <span class="core">GLOBAL MESH SYNC</span> across all cloud providers...`);
+            ['aws', 'gcp', 'azure', 'oracle'].forEach(cloud => {
+                triggerSync(cloud);
+            });
+        }
+
+        // Random background traffic
+        setInterval(() => {
+            const clouds = ['aws', 'gcp', 'azure', 'oracle'];
+            const randomCloud = clouds[Math.floor(Math.random() * clouds.length)];
+            
+            // Just visual, no log for background heartbeat
+            const targetNode = nodes[randomCloud];
+            const pkt = document.createElement('div');
+            pkt.className = 'data-particle';
+            pkt.style.width = '4px'; pkt.style.height = '4px';
+            pkt.style.opacity = '0.5';
+            document.body.appendChild(pkt);
+
+            const toCore = Math.random() > 0.5;
+            gsap.set(pkt, { x: toCore ? targetNode.x : cx, y: toCore ? targetNode.y : cy });
+            gsap.to(pkt, {
+                x: toCore ? cx : targetNode.x, y: toCore ? cy : targetNode.y, 
+                duration: 2, ease: "none", onComplete: () => pkt.remove()
+            });
+
+        }, 800);
+
+    </script>
+</body>
+</html>

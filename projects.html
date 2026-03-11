@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KubeOps | Projects</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- GSAP for Smooth Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis for Buttery Smooth Scrolling -->
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+</head>
+<body>
+    
+    <!-- Navigation -->
+    <nav class="navbar scrolled">
+        <a href="index.html" class="logo">KubeOps<span class="dot">.</span></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="projects.html" style="color: var(--text-main);">Projects</a></li>
+        </ul>
+        <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                <i class="fas fa-sun"></i>
+            </button>
+            <a href="https://calendly.com/chiragptl1111/30min" target="_blank" class="btn btn-outline nav-btn">Hire Me</a>
+        </div>
+    </nav>
+
+    <div class="main-wrapper" style="padding-top: 100px;">
+        <section class="kube-module" style="min-height: auto; padding-top: 4rem; padding-bottom: 2rem;">
+            <div class="module-content">
+                <h1 class="split-text" style="font-size: 4rem; text-align: center; margin-bottom: 1rem;">Case <br><span>Studies.</span></h1>
+                <p class="description" style="text-align: center; max-width: 600px; margin: 0 auto;">Select a project below to enter a real-time cluster simulation and experience zero-downtime architecture from the inside.</p>
+            </div>
+        </section>
+
+        <section class="kube-module" style="padding-top: 0; min-height: 50vh;">
+            <div class="module-content">
+                <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-top: 3rem;">
+                    
+                    <a href="cluster-sim.html?proj=fintech" class="project-entry" style="text-decoration: none;">
+                        <div class="project-card front" style="position: relative; height: 260px; width: 100%; transform: none; display: flex;">
+                            <div class="card-header highlight-header">FinTech Core</div>
+                            <div class="card-metrics highlight-text">10M Requests / Day</div>
+                            <ul style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; padding-left: 1rem;">
+                                <li>Zero Trust Security</li>
+                                <li>Multi-Region Failover</li>
+                            </ul>
+                            <div class="card-action" style="margin-top: auto;">_ENTER SIMULATION <i class="fas fa-sign-in-alt"></i></div>
+                        </div>
+                    </a>
+
+                    <a href="pipeline-sim.html?proj=ecommerce" class="project-entry" style="text-decoration: none;">
+                        <div class="project-card middle" style="position: relative; height: 260px; width: 100%; transform: none; opacity: 1; z-index: 1;">
+                            <div class="card-header" style="color: var(--text-main);">Global E-Commerce</div>
+                            <div class="card-metrics">Uptime: 99.999%</div>
+                            <ul style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; padding-left: 1rem;">
+                                <li>Black Friday Auto-scaling</li>
+                                <li>ArgoCD GitOps Pipeline</li>
+                            </ul>
+                            <div class="card-action" style="margin-top: auto; animation: none;">_ENTER SIMULATION <i class="fas fa-sign-in-alt"></i></div>
+                        </div>
+                    </a>
+
+                    <a href="cloud-sim.html?proj=saas" class="project-entry" style="text-decoration: none;">
+                        <div class="project-card middle" style="position: relative; height: 260px; width: 100%; transform: none; opacity: 1; z-index: 1;">
+                            <div class="card-header" style="color: var(--text-main);">SaaS Platform</div>
+                            <div class="card-metrics">Multi-Tenant K8s</div>
+                            <ul style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; padding-left: 1rem;">
+                                <li>Istio Service Mesh</li>
+                                <li>Prometheus Observability</li>
+                            </ul>
+                            <div class="card-action" style="margin-top: auto; animation: none;">_ENTER SIMULATION <i class="fas fa-sign-in-alt"></i></div>
+                        </div>
+                    <a href="soc-sim.html?proj=mssp" class="project-entry" style="text-decoration: none;">
+                        <div class="project-card middle" style="position: relative; height: 260px; width: 100%; transform: none; opacity: 1; z-index: 1;">
+                            <div class="card-header highlight-header" style="color: var(--success);">Cybersecurity Platform</div>
+                            <div class="card-metrics highlight-text">Global 2000 MSSP</div>
+                            <ul style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; padding-left: 1rem;">
+                                <li>24x7 SOC & Threat Response</li>
+                                <li>Continuous Red Teaming</li>
+                                <li>AppSec & Exposure Management</li>
+                            </ul>
+                            <div class="card-action" style="margin-top: auto; animation: none;">_ENTER SIMULATION <i class="fas fa-sign-in-alt"></i></div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="width: 100%; margin-top: 4rem;">
+            <div class="footer-content">
+                <p>&copy; 2024 KubeOps Consulting. Built for scale.</p>
+                <div class="socials">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+    <style>
+        .project-entry:hover .project-card {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px var(--primary-glow);
+            background: linear-gradient(135deg, rgba(50, 108, 229, 0.1) 0%, var(--bg-offset) 100%);
+        }
+        .project-entry:hover .card-action {
+            animation: fadePulse 2s infinite;
+            color: var(--success);
+        }
+        .project-entry .card-action {
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+    </style>
+</body>
+</html>
