@@ -17,11 +17,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- GSAP for Smooth Animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     
     <!-- Lenis for Buttery Smooth Scrolling -->
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js" defer></script>
 </head>
 <body>
     
@@ -39,11 +39,11 @@
             <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
                 <i class="fas fa-sun"></i>
             </button>
-            <a href="https://calendly.com/chiragptl1111/30min" target="_blank" class="btn btn-outline nav-btn">Hire Me</a>
+            <a href="https://cal.com/k8sops/15min?overlayCalendar=true" target="_blank" class="btn btn-outline nav-btn">Hire Me</a>
         </div>
     </nav>
 
-    <div class="main-wrapper">
+    <main class="main-wrapper">
         <!-- Module 1: Hero / Control Plane -->
         <section class="kube-module" id="control-plane">
             <div class="bg-text" data-speed="0.8">SUITE</div>
@@ -193,57 +193,120 @@
             </div>
         </section>
 
-        <!-- Module 3.5: Tech Stack -->
-        <section class="kube-module" id="tech-stack" style="padding-top: 0;">
-            <div class="bg-text" data-speed="0.8">STACK</div>
+        <!-- Module 3.5: Skills Section -->
+        <section class="kube-module" id="skills" style="padding-top: 0;">
+            <div class="bg-text" data-speed="0.8">SKILLS</div>
             <div class="module-content">
-                <div class="text-center" style="text-align: center; margin-bottom: 4rem;">
-                    <span class="module-label">04 // TOOLS</span>
-                    <h2 class="split-text" style="font-size: 3.5rem;">Our Tech <br><span>Stack.</span></h2>
+                <div class="text-center" style="text-align: center; margin-bottom: 3rem;">
+                    <span class="module-label">04 // PROFICIENCY</span>
+                    <h2 class="split-text" style="font-size: 3.5rem;">Technical <br><span>Skills.</span></h2>
+                    <p class="fade-up" style="color: var(--text-muted); max-width: 600px; margin: 1rem auto 2rem;">A comprehensive suite of tools and platforms I use to build, deploy, and scale robust cloud-native infrastructure.</p>
                 </div>
 
-                <div class="stack-categories" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
-                    
-                    <div class="stack-col">
-                        <h4 style="color: var(--primary); font-family: 'JetBrains Mono', monospace; font-size: 1rem; margin-bottom: 1.5rem; text-transform: uppercase;">Cloud Platforms</h4>
-                        <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-muted); line-height: 2;">
-                            <li><i class="fab fa-aws" style="width: 20px; color: #FF9900;"></i> Amazon Web Services</li>
-                            <li><i class="fab fa-google" style="width: 20px; color: #4285F4;"></i> Google Cloud</li>
-                            <li><i class="fab fa-microsoft" style="width: 20px; color: #00A4EF;"></i> Microsoft Azure</li>
-                            <li><i class="fab fa-digital-ocean" style="width: 20px; color: #0080FF;"></i> DigitalOcean</li>
-                        </ul>
+                <!-- Skill Categories -->
+                <div class="skills-filter fade-up">
+                    <button class="filter-btn active" data-filter="all">All Skills</button>
+                    <button class="filter-btn" data-filter="devops">DevOps</button>
+                    <button class="filter-btn" data-filter="cloud">Cloud</button>
+                    <button class="filter-btn" data-filter="iac">Infra as Code</button>
+                    <button class="filter-btn" data-filter="monitoring">Monitoring</button>
+                </div>
+
+                <!-- Skills Grid -->
+                <div class="skills-grid fade-up" id="skills-grid">
+                    <!-- DevOps -->
+                    <div class="skill-card" data-category="devops">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" class="skill-icon-img" alt="Kubernetes">
+                        <span class="skill-name">Kubernetes</span>
+                    </div>
+                    <div class="skill-card" data-category="devops">
+                        <i class="fab fa-docker skill-icon" style="color: #2496ed;"></i>
+                        <span class="skill-name">Docker</span>
+                    </div>
+                    <div class="skill-card" data-category="devops">
+                        <i class="fas fa-dharmachakra skill-icon" style="color: #66ccff;"></i>
+                        <span class="skill-name">Helm</span>
+                    </div>
+                    <div class="skill-card" data-category="devops">
+                        <i class="fab fa-jenkins skill-icon" style="color: #d24939;"></i>
+                        <span class="skill-name">Jenkins</span>
+                    </div>
+                    <div class="skill-card" data-category="devops">
+                        <i class="fas fa-ship skill-icon" style="color: #ef7b4d;"></i>
+                        <span class="skill-name">ArgoCD</span>
                     </div>
 
-                    <div class="stack-col">
-                        <h4 style="color: var(--primary); font-family: 'JetBrains Mono', monospace; font-size: 1rem; margin-bottom: 1.5rem; text-transform: uppercase;">IaC & Automation</h4>
-                        <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-muted); line-height: 2;">
-                            <li><i class="fas fa-cubes" style="width: 20px;"></i> Terraform</li>
-                            <li><i class="fas fa-server" style="width: 20px;"></i> Ansible</li>
-                            <li><i class="fas fa-network-wired" style="width: 20px;"></i> Pulumi</li>
-                            <li><i class="fas fa-cogs" style="width: 20px;"></i> CloudFormation</li>
-                        </ul>
+                    <!-- Cloud -->
+                    <div class="skill-card" data-category="cloud">
+                        <i class="fab fa-aws skill-icon" style="color: #ff9900;"></i>
+                        <span class="skill-name">AWS</span>
+                    </div>
+                    <div class="skill-card" data-category="cloud">
+                        <i class="fab fa-microsoft skill-icon" style="color: #00a4ef;"></i>
+                        <span class="skill-name">Azure</span>
+                    </div>
+                    <div class="skill-card" data-category="cloud">
+                        <i class="fab fa-google skill-icon" style="color: #4285f4;"></i>
+                        <span class="skill-name">GCP</span>
+                    </div>
+                    <div class="skill-card" data-category="cloud">
+                        <i class="fab fa-digital-ocean skill-icon" style="color: #0080ff;"></i>
+                        <span class="skill-name">DigitalOcean</span>
                     </div>
 
-                    <div class="stack-col">
-                        <h4 style="color: var(--primary); font-family: 'JetBrains Mono', monospace; font-size: 1rem; margin-bottom: 1.5rem; text-transform: uppercase;">CI/CD</h4>
-                        <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-muted); line-height: 2;">
-                            <li><i class="fab fa-github" style="width: 20px;"></i> GitHub Actions</li>
-                            <li><i class="fab fa-gitlab" style="width: 20px;"></i> GitLab CI</li>
-                            <li><i class="fas fa-ship" style="width: 20px;"></i> ArgoCD</li>
-                            <li><i class="fab fa-jenkins" style="width: 20px;"></i> Jenkins</li>
-                        </ul>
+                    <!-- IaC -->
+                    <div class="skill-card" data-category="iac">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" class="skill-icon-img" alt="Terraform">
+                        <span class="skill-name">Terraform</span>
+                    </div>
+                    <div class="skill-card" data-category="iac">
+                        <i class="fas fa-server skill-icon" style="color: #ee0000;"></i>
+                        <span class="skill-name">Ansible</span>
+                    </div>
+                    <div class="skill-card" data-category="iac">
+                        <i class="fas fa-network-wired skill-icon" style="color: #f7af3e;"></i>
+                        <span class="skill-name">Pulumi</span>
+                    </div>
+                    <div class="skill-card" data-category="iac">
+                        <i class="fas fa-cogs skill-icon" style="color: #ff9900;"></i>
+                        <span class="skill-name">CloudFormation</span>
                     </div>
 
-                    <div class="stack-col">
-                        <h4 style="color: var(--primary); font-family: 'JetBrains Mono', monospace; font-size: 1rem; margin-bottom: 1.5rem; text-transform: uppercase;">Monitoring</h4>
-                        <ul style="list-style: none; padding: 0; margin: 0; color: var(--text-muted); line-height: 2;">
-                            <li><i class="fas fa-chart-line" style="width: 20px;"></i> Prometheus</li>
-                            <li><i class="fas fa-chart-pie" style="width: 20px;"></i> Grafana</li>
-                            <li><i class="fas fa-dog" style="width: 20px;"></i> Datadog</li>
-                            <li><i class="fas fa-glasses" style="width: 20px;"></i> ELK Stack</li>
-                        </ul>
+                    <!-- Monitoring -->
+                    <div class="skill-card" data-category="monitoring">
+                        <i class="fas fa-chart-line skill-icon" style="color: #e6522c;"></i>
+                        <span class="skill-name">Prometheus</span>
+                    </div>
+                    <div class="skill-card" data-category="monitoring">
+                        <i class="fas fa-chart-pie skill-icon" style="color: #f47a20;"></i>
+                        <span class="skill-name">Grafana</span>
+                    </div>
+                    <div class="skill-card" data-category="monitoring">
+                        <i class="fas fa-dog skill-icon" style="color: #632ca6;"></i>
+                        <span class="skill-name">Datadog</span>
+                    </div>
+                    <div class="skill-card" data-category="monitoring">
+                        <i class="fas fa-glasses skill-icon" style="color: #00bfb3;"></i>
+                        <span class="skill-name">ELK Stack</span>
                     </div>
 
+                    <!-- Additional Skills (Initially Hidden) -->
+                    <div class="skill-card extra-skill" data-category="devops">
+                        <i class="fab fa-github skill-icon"></i>
+                        <span class="skill-name">GitHub Actions</span>
+                    </div>
+                    <div class="skill-card extra-skill" data-category="devops">
+                        <i class="fab fa-gitlab skill-icon" style="color: #fc6d26;"></i>
+                        <span class="skill-name">GitLab CI</span>
+                    </div>
+                    <div class="skill-card extra-skill" data-category="monitoring">
+                        <i class="fas fa-search-plus skill-icon" style="color: #005571;"></i>
+                        <span class="skill-name">Splunk</span>
+                    </div>
+                </div>
+
+                <div class="text-center" style="text-align: center; margin-top: 3rem;">
+                    <button id="show-more-skills" class="btn btn-outline" style="padding: 0.8rem 2rem; font-size: 0.9rem;">Show All Skills</button>
                 </div>
             </div>
         </section>
@@ -313,7 +376,7 @@
                 <div class="cta-box fade-up">
                     <h2>Ready for production?</h2>
                     <p>Let's discuss how I can help optimize, secure, and operate your cloud-native infrastructure so your team can move faster.</p>
-                    <a href="https://calendly.com/chiragptl1111/30min" target="_blank" class="btn btn-primary btn-large">Book a Meeting</a>
+                    <a href="https://cal.com/k8sops/15min?overlayCalendar=true" target="_blank" class="btn btn-primary btn-large">Book a Meeting</a>
                 </div>
             </div>
             
@@ -321,15 +384,15 @@
                 <div class="footer-content">
                     <p>&copy; 2024 KubeOps Consulting. Built for scale.</p>
                     <div class="socials">
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="GitHub Profile"><i class="fab fa-github"></i></a>
+                        <a href="#" aria-label="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Twitter Profile"><i class="fab fa-twitter"></i></a>
                     </div>
                 </div>
             </footer>
         </section>
-    </div>
+    </main>
 
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

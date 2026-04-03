@@ -185,5 +185,100 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+    // 6. Skills Filtering & Show More
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const skillCards = document.querySelectorAll('.skill-card');
+    const showMoreBtn = document.getElementById('show-more-skills');
+    let isShowingAll = false;
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active button
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.getAttribute('data-filter');
+
+            // Animate cards out and then in
+            gsap.to(skillCards, {
+                opacity: 0,
+                scale: 0.8,
+                duration: 0.2,
+                stagger: 0.02,
+                onComplete: () => {
+                    skillCards.forEach(card => {
+                        const cardCategory = card.getAttribute('data-category');
+                        const isExtra = card.classList.contains('extra-skill');
+                        
+                        // Filtering logic
+                        if (filter === 'all') {
+                            if (isExtra && !isShowingAll) {
+                                card.classList.add('filtered-out');
+                            } else {
+                                card.classList.remove('filtered-out');
+                            }
+                        } else if (cardCategory === filter) {
+                            card.classList.remove('filtered-out');
+                        } else {
+                            card.classList.add('filtered-out');
+                        }
+                    });
+
+                    // Animate visible cards back in
+                    const visibleCards = document.querySelectorAll('.skill-card:not(.filtered-out)');
+                    gsap.fromTo(visibleCards, 
+                        { opacity: 0, scale: 0.8, y: 20 },
+                        { opacity: 1, scale: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "back.out(1.7)" }
+                    );
+                }
+            });
+        });
+    });
+
+    showMoreBtn.addEventListener('click', () => {
+        isShowingAll = !isShowingAll;
+        const extraSkills = document.querySelectorAll('.extra-skill');
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+
+        if (isShowingAll) {
+            showMoreBtn.innerText = "Show Less";
+            extraSkills.forEach(card => {
+                card.classList.add('show');
+                // Only show if it matches current filter
+                if (activeFilter === 'all' || card.getAttribute('data-category') === activeFilter) {
+                    card.classList.remove('filtered-out');
+                }
+            });
+            
+            // Animate only the new ones
+            gsap.fromTo(extraSkills, 
+                { opacity: 0, scale: 0.8, y: 20 },
+                { opacity: 1, scale: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "back.out(1.7)" }
+            );
+        } else {
+            showMoreBtn.innerText = "Show All Skills";
+            extraSkills.forEach(card => {
+                card.classList.remove('show');
+                card.classList.add('filtered-out');
+            });
+        }
+        
+        // Refresh scroll trigger because page height changed
+        ScrollTrigger.refresh();
+    });
+
+    // Initial Skill cards animation when scrolled into view
+    ScrollTrigger.create({
+        trigger: "#skills",
+        start: "top 70%",
+        onEnter: () => {
+            const visibleCards = document.querySelectorAll('.skill-card:not(.filtered-out)');
+            gsap.fromTo(visibleCards, 
+                { opacity: 0, scale: 0.5, y: 50 },
+                { opacity: 1, scale: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
+            );
+        },
+        once: true
+    });
 
 });

@@ -16,10 +16,13 @@ body.light-mode {
     --bg-main: #ffffff;
     --bg-offset: #f8f9fa;
     --text-main: #0f172a;
-    --text-muted: #64748b;
+    --text-muted: #475569; /* Darkened for better contrast */
     --primary: #326ce5;
     --primary-glow: rgba(50, 108, 229, 0.15);
     --border: rgba(0, 0, 0, 0.1);
+    --success: #15803d; /* Safe contrast on white */
+    --warning: #b45309; 
+    --danger: #b91c1c;
 }
 
 * {
@@ -507,4 +510,119 @@ footer {
     h1 { font-size: 3.5rem; }
     h2 { font-size: 2.5rem; }
     .kube-module { padding-top: 8rem; }
+}
+
+/* Skills Section */
+.skills-filter {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.6rem 1.5rem;
+    border-radius: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    border-color: var(--primary);
+    color: var(--text-main);
+    background: rgba(50, 108, 229, 0.05);
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.skill-card {
+    background: rgba(150, 150, 150, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: default;
+    backdrop-filter: blur(5px);
+}
+
+.skill-card:hover {
+    transform: translateY(-10px);
+    background: rgba(150, 150, 150, 0.05);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-glow);
+}
+
+.skill-icon {
+    font-size: 2.5rem;
+    transition: transform 0.3s ease;
+}
+
+.skill-icon-svg,
+.skill-icon-img {
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: transform 0.3s ease;
+}
+
+.skill-card:hover .skill-icon,
+.skill-card:hover .skill-icon-svg,
+.skill-card:hover .skill-icon-img {
+    transform: scale(1.1);
+}
+
+.skill-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+}
+
+.skill-card:hover .skill-name {
+    color: var(--text-main);
+}
+
+.extra-skill {
+    display: none; /* Initially hidden */
+}
+
+.extra-skill.show {
+    display: flex;
+    animation: fadeInScale 0.5s ease forwards;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Hide cards that don't match filter */
+.skill-card.filtered-out {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .skills-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+    .skill-icon {
+        font-size: 2rem;
+    }
 }
