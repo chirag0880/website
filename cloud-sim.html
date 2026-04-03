@@ -272,12 +272,22 @@
     <div class="grid-dots"></div>
 
     <nav class="sim-nav">
-        <a href="projects.html" class="btn-outline" style="text-decoration:none; color:var(--text-main); border:1px solid var(--border); padding: 0.6rem 1.2rem; border-radius:4px; font-size: 0.8rem; font-family:'JetBrains Mono';">
-            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit Network
-        </a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="projects.html" class="btn-outline" style="text-decoration:none; color:var(--text-main); border:1px solid var(--border); padding: 0.6rem 1.2rem; border-radius:4px; font-size: 0.8rem; font-family:'JetBrains Mono';" data-i18n="sim_exit">
+                <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit Network
+            </a>
+            <select id="language-select" class="lang-selector">
+                <option value="en">EN</option>
+                <option value="de">DE</option>
+                <option value="es">ES</option>
+                <option value="fr">FR</option>
+                <option value="it">IT</option>
+                <option value="pt">PT</option>
+            </select>
+        </div>
         <div class="sim-title">
             <div class="pulse-dot-purple"></div>
-            <span>SAAS_MESH_NETWORK // MULTI-CLOUD ACTIVE</span>
+            <span data-i18n="sim_cloud_title">SAAS_MESH_NETWORK // MULTI-CLOUD ACTIVE</span>
         </div>
         <div style="width: 100px;"></div>
     </nav>
@@ -309,12 +319,12 @@
 
     <!-- Controls -->
     <div class="control-panel">
-        <div style="font-family:'Syncopate'; font-size:0.8rem; color:#8b5cf6; margin-bottom:15px; border-bottom:1px solid rgba(139,92,246,0.3); padding-bottom:5px;">Traffic Controls</div>
-        <button class="btn" onclick="triggerSync('aws')">Sync AWS Data</button>
-        <button class="btn" onclick="triggerSync('gcp')">Load Balance GCP</button>
-        <button class="btn" onclick="triggerSync('azure')">Failover to Azure</button>
-        <button class="btn" onclick="triggerSync('oracle')">Backup to Oracle</button>
-        <button class="btn" onclick="triggerGlobalSync()" style="background:rgba(255,255,255,0.1); border-color:#fff; margin-top:15px;">Global Mesh Sync</button>
+        <div style="font-family:'Syncopate'; font-size:0.8rem; color:#8b5cf6; margin-bottom:15px; border-bottom:1px solid rgba(139,92,246,0.3); padding-bottom:5px;" data-i18n="sim_traffic_ctrl">Traffic Controls</div>
+        <button class="btn" onclick="triggerSync('aws')" data-i18n="sim_sync_aws">Sync AWS Data</button>
+        <button class="btn" onclick="triggerSync('gcp')" data-i18n="sim_lb_gcp">Load Balance GCP</button>
+        <button class="btn" onclick="triggerSync('azure')" data-i18n="sim_failover_azure">Failover to Azure</button>
+        <button class="btn" onclick="triggerSync('oracle')" data-i18n="sim_backup_oracle">Backup to Oracle</button>
+        <button class="btn" onclick="triggerGlobalSync()" style="background:rgba(255,255,255,0.1); border-color:#fff; margin-top:15px;" data-i18n="sim_global_sync">Global Mesh Sync</button>
     </div>
 
     <!-- Terminal -->
@@ -463,5 +473,7 @@
         }, 800);
 
     </script>
+    <script src="translations.js"></script>
+    <script src="i18n.js"></script>
 </body>
 </html>

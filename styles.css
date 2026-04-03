@@ -315,8 +315,37 @@ h1 span, h2 span { color: var(--primary); text-shadow: 0 0 30px var(--primary-gl
     background: rgba(150,150,150,0.05);
     border: 1px solid var(--border);
     border-radius: 4px;
-    transition: all 0.5s ease;
+    padding: 1rem 2rem;
+    transition: all 0.3s ease;
 }
+
+/* Language Selector */
+.lang-selector {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.lang-selector:hover {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.lang-selector option {
+    background: var(--bg-main);
+    color: var(--text-main);
+}
+
+/* Animations */
+.fade-up { opacity: 0; }
 .node-item.active { background: rgba(50, 108, 229, 0.1); border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); }
 
 .pipeline-visual {

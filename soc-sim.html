@@ -263,12 +263,22 @@
     <div class="radar-scan"></div>
 
     <nav class="sim-nav">
-        <a href="projects.html" class="btn-outline" style="text-decoration:none; color:var(--text-main); border:1px solid rgba(39,201,63,0.3); padding: 0.6rem 1.2rem; border-radius:4px; font-size: 0.8rem; font-family:'JetBrains Mono';">
-            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Disconnect
-        </a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="projects.html" class="btn-outline" style="text-decoration:none; color:var(--text-main); border:1px solid rgba(39,201,63,0.3); padding: 0.6rem 1.2rem; border-radius:4px; font-size: 0.8rem; font-family:'JetBrains Mono';" data-i18n="sim_disconnect">
+                <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Disconnect
+            </a>
+            <select id="language-select" class="lang-selector">
+                <option value="en">EN</option>
+                <option value="de">DE</option>
+                <option value="es">ES</option>
+                <option value="fr">FR</option>
+                <option value="it">IT</option>
+                <option value="pt">PT</option>
+            </select>
+        </div>
         <div class="sim-title">
             <div class="pulse-dot-red"></div>
-            <span>SOC_GLOBAL_THREAT_MAP // LIVE</span>
+            <span data-i18n="sim_soc_title">SOC_GLOBAL_THREAT_MAP // LIVE</span>
         </div>
         <div style="width: 100px;"></div>
     </nav>
@@ -281,15 +291,15 @@
 
     <!-- Left Panel: Threat Intelligence -->
     <div class="soc-panel" id="panel-left">
-        <div class="panel-title"><i class="fas fa-globe"></i> Threat Intelligence Stream</div>
+        <div class="panel-title" data-i18n="sim_intel_stream"><i class="fas fa-globe"></i> Threat Intelligence Stream</div>
         <div class="status-grid">
             <div class="status-box">
                 <div class="st-val" id="val-threats">0</div>
-                <div class="st-lbl">Active Threats</div>
+                <div class="st-lbl" data-i18n="sim_active_threats">Active Threats</div>
             </div>
             <div class="status-box">
                 <div class="st-val" id="val-blocked">0</div>
-                <div class="st-lbl">Attacks Blocked</div>
+                <div class="st-lbl" data-i18n="sim_attacks_blocked">Attacks Blocked</div>
             </div>
         </div>
         <div class="log-list" id="threat-logs">
@@ -299,15 +309,15 @@
 
     <!-- Right Panel: Defense Systems -->
     <div class="soc-panel" id="panel-right">
-        <div class="panel-title"><i class="fas fa-shield-halved"></i> Automated Defense Array (XDR)</div>
+        <div class="panel-title" data-i18n="sim_defense_array"><i class="fas fa-shield-halved"></i> Automated Defense Array (XDR)</div>
         <div class="status-grid">
             <div class="status-box safe">
                 <div class="st-val">99%</div>
-                <div class="st-lbl">Network Integrity</div>
+                <div class="st-lbl" data-i18n="sim_net_integrity">Network Integrity</div>
             </div>
             <div class="status-box safe">
                 <div class="st-val">ONLINE</div>
-                <div class="st-lbl">WAF Status</div>
+                <div class="st-lbl" data-i18n="sim_waf_status">WAF Status</div>
             </div>
         </div>
         <div class="log-list" id="defense-logs">
@@ -317,8 +327,8 @@
 
     <!-- Interactions -->
     <div class="controls">
-        <button class="btn btn-attack" onclick="triggerDDoS()"><i class="fas fa-satellite-dish"></i> Simulate DDoS Attack</button>
-        <button class="btn btn-defense" onclick="triggerZeroTrust()"><i class="fas fa-lock"></i> Enforce Zero Trust</button>
+        <button class="btn btn-attack" onclick="triggerDDoS()" data-i18n="sim_ddos_btn"><i class="fas fa-satellite-dish"></i> Simulate DDoS Attack</button>
+        <button class="btn btn-defense" onclick="triggerZeroTrust()" data-i18n="sim_zt_btn"><i class="fas fa-lock"></i> Enforce Zero Trust</button>
     </div>
 
     <script>
@@ -463,5 +473,7 @@
         }, 1500);
 
     </script>
+    <script src="translations.js"></script>
+    <script src="i18n.js"></script>
 </body>
 </html>

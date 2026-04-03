@@ -237,11 +237,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showMoreBtn.addEventListener('click', () => {
         isShowingAll = !isShowingAll;
+        showMoreBtn.setAttribute('data-showing-all', isShowingAll);
+        const currentLang = localStorage.getItem('language') || 'en';
+        
         const extraSkills = document.querySelectorAll('.extra-skill');
         const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
 
         if (isShowingAll) {
-            showMoreBtn.innerText = "Show Less";
+            showMoreBtn.innerText = translations[currentLang]['skill_show_less'];
             extraSkills.forEach(card => {
                 card.classList.add('show');
                 // Only show if it matches current filter
@@ -256,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 { opacity: 1, scale: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "back.out(1.7)" }
             );
         } else {
-            showMoreBtn.innerText = "Show All Skills";
+            showMoreBtn.innerText = translations[currentLang]['skill_show_more'];
             extraSkills.forEach(card => {
                 card.classList.remove('show');
                 card.classList.add('filtered-out');

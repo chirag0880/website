@@ -295,14 +295,24 @@
     <div class="cluster-bg"></div>
 
     <nav class="sim-nav">
-        <a href="projects.html" class="btn-outline" style="text-decoration:none; color:var(--text-main); border:1px solid var(--border); padding: 0.6rem 1.2rem; border-radius:4px; font-size: 0.8rem; font-family:'JetBrains Mono';">
-            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit CI/CD
-        </a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="projects.html" class="btn-outline" style="text-decoration:none; color:var(--text-main); border:1px solid var(--border); padding: 0.6rem 1.2rem; border-radius:4px; font-size: 0.8rem; font-family:'JetBrains Mono';" data-i18n="sim_exit_cicd">
+                <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit CI/CD
+            </a>
+            <select id="language-select" class="lang-selector">
+                <option value="en">EN</option>
+                <option value="de">DE</option>
+                <option value="es">ES</option>
+                <option value="fr">FR</option>
+                <option value="it">IT</option>
+                <option value="pt">PT</option>
+            </select>
+        </div>
         <div class="sim-title">
             <div class="pulse-dot"></div>
-            <span>PIPELINE: global-ecommerce | BRANCH: main</span>
+            <span data-i18n="sim_branch_label">PIPELINE: global-ecommerce | BRANCH: main</span>
         </div>
-        <div style="width: 100px;"></div> <!-- Spacer -->
+        <div style="width: 100px;"></div>
     </nav>
 
     <div id="sim-viewport">
@@ -311,7 +321,7 @@
             <!-- Stage 1 -->
             <div class="pipe-stage" id="stage-source">
                 <div class="stage-icon"><i class="fab fa-git-alt"></i></div>
-                <div class="stage-label">Source</div>
+                <div class="stage-label" data-i18n="sim_stage_source">Source</div>
                 <div class="stage-status">READY</div>
             </div>
             
@@ -320,7 +330,7 @@
             <!-- Stage 2 -->
             <div class="pipe-stage" id="stage-build">
                 <div class="stage-icon"><i class="fas fa-box-open"></i></div>
-                <div class="stage-label">Build</div>
+                <div class="stage-label" data-i18n="sim_stage_build">Build</div>
                 <div class="stage-status">WAITING</div>
             </div>
 
@@ -329,7 +339,7 @@
             <!-- Stage 3 -->
             <div class="pipe-stage" id="stage-test">
                 <div class="stage-icon"><i class="fas fa-vial"></i></div>
-                <div class="stage-label">Test</div>
+                <div class="stage-label" data-i18n="sim_stage_test">Test</div>
                 <div class="stage-status">WAITING</div>
             </div>
 
@@ -338,7 +348,7 @@
             <!-- Stage 4 -->
             <div class="pipe-stage" id="stage-security">
                 <div class="stage-icon"><i class="fas fa-shield-halved"></i></div>
-                <div class="stage-label">Sec Scan</div>
+                <div class="stage-label" data-i18n="sim_stage_sec">Sec Scan</div>
                 <div class="stage-status">WAITING</div>
             </div>
 
@@ -347,20 +357,20 @@
             <!-- Stage 5 -->
             <div class="pipe-stage" id="stage-deploy">
                 <div class="stage-icon"><i class="fas fa-rocket"></i></div>
-                <div class="stage-label">Deploy</div>
+                <div class="stage-label" data-i18n="sim_stage_deploy">Deploy</div>
                 <div class="stage-status">WAITING</div>
             </div>
         </div>
 
         <div class="controls">
-            <button class="btn btn-trigger" onclick="runPipeline()"><i class="fas fa-play"></i> Trigger Pipeline</button>
-            <button class="btn btn-fail" onclick="forceFailure()"><i class="fas fa-skull"></i> Inject Test Failure</button>
+            <button class="btn btn-trigger" onclick="runPipeline()" data-i18n="sim_trigger_btn"><i class="fas fa-play"></i> Trigger Pipeline</button>
+            <button class="btn btn-fail" onclick="forceFailure()" data-i18n="sim_inject_fail_btn"><i class="fas fa-skull"></i> Inject Test Failure</button>
         </div>
 
     </div>
 
     <div class="terminal-panel" id="terminal">
-        <div class="log-line"><span class="time">[SYSTEM]</span> ArgoCD GitOps engine initialized. Waiting for webhook...</div>
+        <div class="log-line"><span class="time">[SYSTEM]</span> <span data-i18n="sim_sys_msg">ArgoCD GitOps engine initialized. Waiting for webhook...</span></div>
     </div>
 
     <script>
@@ -382,10 +392,10 @@
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        function setStageState(stageId, state, statusText) {
+        function setStageState(stageId, state, statusKey) {
             const el = document.getElementById(stageId);
             el.className = `pipe-stage ${state}`;
-            el.querySelector('.stage-status').innerText = statusText;
+            el.querySelector('.stage-status').innerText = t(statusKey);
         }
 
         function animateConnector(fillId, pktId, duration) {
@@ -471,23 +481,25 @@
             await animateConnector('fill-4', 'pkt-4', 1);
 
             // 5. Deploy
-            setStageState('stage-deploy', 'running', 'DEPLOYING');
-            appendLog('info', 'ArgoCD syncing manifest to us-west-2 cluster...');
+            setStageState('stage-deploy', 'running', 'sim_status_deploying');
+            appendLog('info', t('sim_log_deploying'));
             await new Promise(r => setTimeout(r, 1500));
-            appendLog('info', 'Rolling update strategy initiated. Pods creating...');
+            appendLog('info', t('sim_log_rolling'));
             await new Promise(r => setTimeout(r, 1000));
-            appendLog('success', 'Deployment successful. Application is live at 99.999% availability.');
-            setStageState('stage-deploy', 'success', 'LIVE');
+            appendLog('success', t('sim_log_deployed'));
+            setStageState('stage-deploy', 'success', 'sim_status_live');
 
             isRunning = false;
         }
 
         // Auto-run pipeline after 2 seconds
         setTimeout(() => {
-            appendLog('info', 'Automated CI/CD hook detected. Starting deployment pipeline...');
+            appendLog('info', t('sim_log_auto_start'));
             runPipeline();
         }, 2000);
 
     </script>
+    <script src="translations.js"></script>
+    <script src="i18n.js"></script>
 </body>
 </html>

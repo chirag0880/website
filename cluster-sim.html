@@ -387,12 +387,22 @@
     </div>
 
     <nav class="sim-nav">
-        <a href="projects.html" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.8rem;">
-            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit Node
-        </a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="projects.html" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.8rem;" data-i18n="sim_exit">
+                <i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Exit Node
+            </a>
+            <select id="language-select" class="lang-selector">
+                <option value="en">EN</option>
+                <option value="de">DE</option>
+                <option value="es">ES</option>
+                <option value="fr">FR</option>
+                <option value="it">IT</option>
+                <option value="pt">PT</option>
+            </select>
+        </div>
         <div class="sim-title">
             <div class="pulse-dot"></div>
-            <span id="nav-ns-label">NAMESPACE: production | REGION: us-east-1</span>
+            <span id="nav-ns-label" data-i18n="sim_cluster_title">KubeOps // LIVE_CLUSTER_SIMULATION</span>
         </div>
         <button onclick="startTutorial()" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.8rem; border-color: var(--primary); color: var(--primary);">
             <i class="fas fa-play" style="margin-right: 8px;"></i> Start Tour
@@ -408,18 +418,18 @@
             <div id="panel-pod-status" class="pod-status-badge bg-running">Running</div>
             <br>
             <button id="btn-kill-pod" class="btn-kill" onclick="killCurrentPod()">
-                <i class="fas fa-skull"></i> Simulate Pod Failure
+                <i class="fas fa-skull"></i> <span data-i18n="sim_failover_btn">Simulate Pod Failure</span>
             </button>
         </div>
 
         <div class="metrics-mini">
             <div class="metric-box">
                 <div id="metric-cpu" class="metric-val">12m</div>
-                <div class="metric-lbl">CPU Usage</div>
+                <div class="metric-lbl" data-i18n="sim_load">CPU Usage</div>
             </div>
             <div class="metric-box">
                 <div id="metric-mem" class="metric-val">128Mi</div>
-                <div class="metric-lbl">Memory</div>
+                <div class="metric-lbl" data-i18n="sim_pods">Memory</div>
             </div>
         </div>
 
@@ -428,6 +438,8 @@
             <!-- Logs spawn here -->
         </div>
     </div>
+    <script src="translations.js"></script>
+    <script src="i18n.js"></script>
 
     <script>
         const viewport = document.getElementById('sim-viewport');
